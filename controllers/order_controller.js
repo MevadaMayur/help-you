@@ -27,7 +27,7 @@ const getOrder = async (req, res) => {
   try {
     const { user_id } = req.body;
 
-    const orderQuery = 'SELECT * FROM orders WHERE user_id = $1';
+    const orderQuery = 'SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC';
     const orderValues = [user_id];
     const orderResult = await db.pool.query(orderQuery, orderValues);
     const orders = orderResult.rows;
@@ -55,24 +55,21 @@ const getOrder = async (req, res) => {
 
 const GetOrders = async (req, res) => {
   try {
-    const query = 'SELECT * FROM orders';
+    const query = 'SELECT * FROM orders ORDER BY created_at DESC';
     const result = await db.pool.query(query);
     const orders = result.rows;
 
     for (const order of orders) {
       const productIds = order.product_id.map(Number);
 
-      // Retrieve products for the current order
       const productQuery = 'SELECT * FROM products WHERE id IN (' + productIds.join(', ') + ')';
       const productResult = await db.pool.query(productQuery);
       const products = productResult.rows;
 
-      // Retrieve address information for the current order
       const addressQuery = 'SELECT * FROM address WHERE address_id = $1'; 
       const addressResult = await db.pool.query(addressQuery, [order.address_id]);
       const address = addressResult.rows[0];
 
-      // Retrieve user information for the current order
       const userQuery = 'SELECT * FROM users WHERE user_id = $1';
       const userResult = await db.pool.query(userQuery, [order.user_id]);
       const user = userResult.rows[0];
