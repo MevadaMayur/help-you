@@ -32,7 +32,7 @@ const addService = (req, res) => {
     if (err) {
       console.error(err);
       return res.status(500).json({
-        error: 'An error occurred while saving the data.',
+        error: 'An error occurred while saving the data.',err,
       });
     }
 
