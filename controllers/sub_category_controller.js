@@ -47,23 +47,25 @@ const addSubcategory = (req, res) => {
   const getSubcategory = async (req, res) => {
     try {
       const query = `
-        SELECT sc.*, c.name AS  category_name
+        SELECT sc.*, c.name AS category_name
         FROM sub_category sc
         INNER JOIN category c ON c.id = sc.category_id::integer
+        WHERE sc.is_deleted = false; 
       `;
-    
+  
       const result = await db.pool.query(query);
-    
+  
       res.status(200).json({
-        msg: "Data fetched successfully",
+        success: true,
+        message: 'Data fetched successfully',
         data: result.rows,
-        status: 1
       });
     } catch (error) {
       console.error('Error fetching subcategories:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
     }
   };
+  
   
   const updateSubcategory = async (req, res) => {
     const { name, id } = req.body;
@@ -90,9 +92,30 @@ const addSubcategory = (req, res) => {
     }
   };
 
+  const deleteSubcategory = async (req, res) => {
+    const { id } = req.body;
+  
+    try {
+      const query = 'UPDATE sub_category SET is_deleted = true WHERE id = $1 RETURNING *';
+      const values = [id];
+  
+      const result = await db.pool.query(query, values);
+  
+      res.status(200).json({
+        success: true,
+        message: "Data deleted successfully",
+        data: result.rows,
+      });
+    } catch (error) {
+      console.error('Error deleting subcategory:', error);
+      res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+    }
+  };
+
 module.exports = {
     addSubcategory,
     upload,
     getSubcategory,
-    updateSubcategory
+    updateSubcategory,
+    deleteSubcategory
 };

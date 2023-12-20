@@ -1,8 +1,5 @@
 const Database = require('../database/database');
 const db = new Database()
-const commonResponse = (status, message, data) => {
-  return { status, message, data };
-};
 
 const gethome = async (req, res) => {
   try {
