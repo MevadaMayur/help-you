@@ -90,10 +90,42 @@ const GetOrders = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  const { status, id } = req.body;
 
+  try {
+    const queryOldStatus = 'SELECT status FROM orders WHERE id = $1';
+    const valuesOldStatus = [id];
+    const oldStatusResult = await db.pool.query(queryOldStatus, valuesOldStatus);
+    const oldStatus = oldStatusResult.rows[0].status;
+
+    const updateOrderQuery = 'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *';
+    const updateOrderValues = [status, id];
+    const result = await db.pool.query(updateOrderQuery, updateOrderValues);
+
+    const insertHistoryQuery = 'INSERT INTO order_status_history (id, old_status, new_status) VALUES ($1, $2, $3)';
+    const insertHistoryValues = [id, oldStatus, status];
+    await db.pool.query(insertHistoryQuery, insertHistoryValues);
+
+    res.status(200).json({
+      status: 200,
+      message: 'Order status updated successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error occurred during order status update:', error);
+    const response = {
+      status: 500,
+      error: 'Internal server error',
+      message: 'Something went wrong: ' + error.message,
+    };
+    res.status(500).json(response);
+  }
+};
 
 module.exports = {
   placeOrder,
   getOrder,
-  GetOrders
+  GetOrders,
+  updateStatus
 };

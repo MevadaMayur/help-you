@@ -14,7 +14,6 @@ const addProduct = (req, res) => {
           error: err,
         });
       }
-  
       res.status(200).json({
         message: 'Data created successfully',
         data: result.rows[0],
@@ -43,7 +42,6 @@ const addProduct = (req, res) => {
 
   const deleteProduct = async (req, res) => {
     const { id } = req.body;
-  
     try {
       const query = 'UPDATE products SET is_deleted = true WHERE id = $1 RETURNING *';
       const values = [id];
