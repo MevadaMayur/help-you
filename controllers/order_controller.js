@@ -23,6 +23,26 @@ const placeOrder = (req, res) => {
   });
 };
 
+function addLeadingZero(number) {
+  return number < 10 ? `0${number}` : number.toString();
+}
+
+function convertUTCToIST(utcDateString) {
+  const utcDate = new Date(utcDateString);
+
+  const indianTimeOffsetMinutes = 330;
+
+  utcDate.setMinutes(utcDate.getMinutes() + indianTimeOffsetMinutes);
+
+  const day = addLeadingZero(utcDate.getDate());
+  const month = addLeadingZero(utcDate.getMonth() + 1); 
+  const year = utcDate.getFullYear().toString().slice(-2);
+
+  const formattedDate = `${day}-${month}-${year}`;
+
+  return formattedDate;
+}
+
 const getOrder = async (req, res) => {
   try {
     const { user_id } = req.body;
@@ -52,6 +72,9 @@ const getOrder = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+const utcDateString = '2023-10-04T12:30:00Z';
+const istDate = convertUTCToIST(utcDateString);
 
 const GetOrders = async (req, res) => {
   try {
