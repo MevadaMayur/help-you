@@ -91,7 +91,7 @@ const GetOrders = async (req, res) => {
 
       const addressQuery = 'SELECT * FROM address WHERE address_id = $1'; 
       const addressResult = await db.pool.query(addressQuery, [order.address_id]);
-      const address = addressResult.rows[0];
+      const address = addressResult.rows[0];``
 
       const userQuery = 'SELECT * FROM users WHERE user_id = $1';
       const userResult = await db.pool.query(userQuery, [order.user_id]);

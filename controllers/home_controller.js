@@ -1,10 +1,13 @@
 const Database = require('../database/database');
-const db = new Database()
+const db = new Database();
 
 const gethome = async (req, res) => {
   try {
     const bannerQuery = 'SELECT * FROM add_banner WHERE is_deleted = false ORDER BY created_at DESC';
-    const bannerResult = await db.pool.query(bannerQuery);
+    const bannerResult = await db.pool.query(bannerQuery).catch((error) => {
+      console.error('Error executing banner query:', error);
+      throw error;
+    });
 
     const mainQuery = `
       SELECT
@@ -27,7 +30,7 @@ const gethome = async (req, res) => {
               FROM
                 sub_category
               LEFT JOIN
-                products ON sub_category.id = products.sub_category_id::INTEGER
+                products ON sub_category.id = NULLIF(products.sub_category_id, '')::INTEGER
               GROUP BY
                 sub_category.id
             ) AS sub_category_with_products ON category.id = sub_category_with_products.category_id::INTEGER
@@ -40,7 +43,10 @@ const gethome = async (req, res) => {
         service.id;
     `;
 
-    const mainResult = await db.pool.query(mainQuery);
+    const mainResult = await db.pool.query(mainQuery).catch((error) => {
+      console.error('Error executing main query:', error);
+      throw error;
+    });
 
     res.status(200).json({
       message: 'Data fetched successfully',
@@ -51,7 +57,7 @@ const gethome = async (req, res) => {
   } catch (error) {
     console.error('An error occurred while fetching the data:', error);
     res.status(500).json({
-      error: 'Internal server error',
+      error: error,
       status: 0
     });
   }

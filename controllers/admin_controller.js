@@ -53,7 +53,6 @@ const login = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getUserLogin,
   login
