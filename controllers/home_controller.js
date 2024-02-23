@@ -58,7 +58,7 @@ const gethome = async (req, res) => {
     console.error('An error occurred while fetching the data:', error);
     res.status(500).json({
       error: error,
-      status: 0
+      status: 100
     });
   }
 };
